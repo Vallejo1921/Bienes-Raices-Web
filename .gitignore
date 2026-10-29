@@ -7,8 +7,6 @@ npm-debug.log*
 *.log
 
 # Secretos y credenciales (nunca se publican)
-.env
-.env.*
 serviceAccountKey.json
 *-adminsdk-*.json
 *.pem
@@ -18,7 +16,6 @@ serviceAccountKey.json
 # Sistema operativo y editores
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
 
 # Fotos originales de WhatsApp (material de origen, nunca se publican).
@@ -29,3 +26,4 @@ WhatsApp Image *.jpeg
 
 __pycache__/
 *.pyc
+config.bat
