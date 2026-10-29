@@ -1,5 +1,66 @@
 {
   "version": 1,
-  "updatedAt": null,
-  "properties": []
+  "updatedAt": "2026-10-28T21:00:00.000Z",
+  "properties": [
+    {
+      "id": "UI-001",
+      "title": "Residencia Contemporánea con Alberca en Lomas Verdes",
+      "operation": "venta",
+      "type": "casa",
+      "neighborhood": "Lomas Verdes",
+      "city": "Naucalpan de Juárez",
+      "state": "Estado de México",
+      "address": "Paseo de las Cumbres 420",
+      "price": 8950000,
+      "construction": 380,
+      "lot": 450,
+      "beds": 4,
+      "baths": 4.5,
+      "parking": 3,
+      "year": 2024,
+      "description": "Residencia de diseño arquitectónico vanguardista con techos de triple altura, acabados en madera de nogal y mármol carrara. Cuenta con alberca climatizada con deck de teca, cocina de autor con isla de cuarzo, amplio jardín privado, paneles solares y sistema de domótica integral.",
+      "features": [
+        "Alberca climatizada",
+        "Cocina de autor",
+        "Jardín privado",
+        "Domótica integral",
+        "Paneles solares",
+        "Roof garden"
+      ],
+      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Fachada vanguardista de casa moderna con alberca y cancelería minimalista",
+      "createdAt": "2026-10-28T18:00:00.000Z",
+      "updatedAt": "2026-10-28T18:00:00.000Z"
+    },
+    {
+      "id": "UI-002",
+      "title": "Casa Minimalista con Patio Interior y Terraza",
+      "operation": "renta",
+      "type": "casa",
+      "neighborhood": "Jardines del Pedregal",
+      "city": "Ciudad de México",
+      "state": "CDMX",
+      "address": "Av. de los Fuentes 185",
+      "price": 65000,
+      "construction": 310,
+      "lot": 360,
+      "beds": 3,
+      "baths": 3.5,
+      "parking": 2,
+      "year": 2023,
+      "description": "Casa contemporánea en privada con vigilancia 24/7. Destaca por su iluminación natural envolvente alrededor de un jardín zen interior, recámara principal con vestidor doble, terraza techada con asador argentino y estudio independiente ideal para home office de alto nivel.",
+      "features": [
+        "Seguridad 24/7",
+        "Patio zen interior",
+        "Terraza con asador",
+        "Estudio para home office",
+        "Walk-in closet",
+        "Pet friendly"
+      ],
+      "image": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Casa residencial contemporánea iluminada de noche con terraza y jardín",
+      "createdAt": "2026-10-28T19:00:00.000Z",
+      "updatedAt": "2026-10-28T19:00:00.000Z"
+    }
+  ]
 }
