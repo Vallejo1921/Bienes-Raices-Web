@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#05080E">
+<meta name="robots" content="noindex, nofollow">
+<title>Editor local de propiedades · ADAHRA</title>
+<meta name="description" content="Editor local del catálogo JSON de ADAHRA Bienes Raíces. No publica en Internet.">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png">
+<style>
+  :root {
+    --night: #05080E;
+    --navy: #0A1422;
+    --navy-raised: #101E32;
+    --gold: #C5A059;
+    --gold-light: #D8B775;
+    --gold-deep: #8A6A2B;
+    --canvas: #F6F4EE;
+    --paper: #FFFFFF;
+    --ink: #0A1422;
+    --graphite: #4E5866;
+    --line: #D8D2C5;
+    --blue: #0A1422;
+    --blue-deep: #05080E;
+    --blue-soft: #EDE7DA;
+    --rust: #8A6A2B;
+    --rust-deep: #6B5120;
+    --rust-soft: #F1E9DA;
+    --danger: #8C3A2C;
+    --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, "Times New Roman", serif;
+    --sans: Optima, Candara, "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", "Liberation Mono", Menlo, Consolas, monospace;
+    --measure: 1180px;
+    --gutter: clamp(1.1rem, 4vw, 3rem);
+  }
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
+
+  html {
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img { display: block; max-width: 100%; }
+  [hidden] { display: none !important; }
+
+  a {
+    color: inherit;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+  }
+
+  button,
+  input,
+  select,
+  textarea { font: inherit; }
+
+  h1, h2, h3, p, dl, dd, figure { margin: 0; }
+
+  h1, h2, h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection { background: var(--blue); color: var(--paper); }
+
+  :focus-visible {
+    outline: 3px solid var(--rust);
+    outline-offset: 3px;
+  }
+
+  .container {
+    width: min(calc(100% - (var(--gutter) * 2)), var(--measure));
+    margin-inline: auto;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: -5rem;
+    left: 1rem;
+    z-index: 200;
+    padding: 0.8rem 1rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .skip-link:focus { top: 1rem; }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+    color: var(--gold-deep);
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 1px;
+    flex: none;
+    background: currentColor;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.62rem 1rem;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  }
+  .btn:hover { background: var(--ink); color: var(--paper); }
+  .btn-primary {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: var(--paper);
+  }
+  .btn-primary:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+  .btn-line { background: var(--paper); }
+  .btn-line:hover { background: var(--ink); color: var(--paper); }
+  .btn-danger {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--paper);
+  }
+  .btn-danger:hover { background: #6E2C21; border-color: #6E2C21; }
+  .btn:disabled { cursor: not-allowed; opacity: 0.55; }
+
+  /* Header */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--night);
+    border-bottom: 1px solid rgba(197, 160, 89, 0.32);
+  }
+  .header-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem var(--gutter);
+    border-bottom: 1px solid rgba(197, 160, 89, 0.18);
+    color: #A9A294;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .header-meta .local-tag { color: var(--gold-light); }
+  .header-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: min(calc(100% - (var(--gutter) * 2)), var(--measure));
+    margin-inline: auto;
+    min-height: 70px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    flex: none;
+  }
+  .brand-mark {
+    display: block;
+    width: 44px;
+    height: 44px;
+    padding: 3px;
+    border: 1px solid rgba(197, 160, 89, 0.6);
+    background: #000;
+    flex: none;
+  }
+  .brand-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .brand-text { display: flex; flex-direction: column; gap: 0.08rem; }
+  .brand-text strong {
+    color: var(--canvas);
+    font-family: var(--sans);
+    font-size: 1.22rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    line-height: 1;
+  }
+  .brand-text small {
+    color: var(--gold);
+    font-family: var(--mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .header-actions .btn {
+    min-height: 44px;
+    background: transparent;
+    border-color: rgba(197, 160, 89, 0.55);
+    color: var(--ivory, #F6F4EE);
+  }
+  .header-actions .btn:hover { background: var(--gold); border-color: var(--gold); color: var(--night); }
+  .site-header :focus-visible { outline-color: var(--gold-light); }
+
+  main { padding-block: clamp(2rem, 5vw, 3.8rem) clamp(3rem, 6vw, 5rem); }
+  main:focus { outline: none; }
+
+  .page-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: end;
+    padding-bottom: 1.4rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .page-head h1 {
+    max-width: 20ch;
+    font-size: clamp(2.3rem, 5vw, 4rem);
+  }
+  .page-head h1 em { color: var(--gold-deep); font-style: italic; }
+  .page-lede {
+    max-width: 44ch;
+    color: var(--graphite);
+    font-size: 0.94rem;
+  }
+
+  .notice {
+    margin-top: 1.2rem;
+    padding: 0.8rem 0.95rem;
+    border-left: 4px solid var(--rust);
+    background: var(--rust-soft);
+    color: var(--rust-deep);
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+  .notice strong { color: var(--ink); }
+  .editor-status-line {
+    margin: 1.4rem 0 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .editor-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.7rem 1rem;
+    margin-top: 1.2rem;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .editor-tools .search-field { flex: 1 1 18rem; }
+  .editor-tools .btn { min-height: 46px; }
+  .storage-warning {
+    margin-top: 1rem;
+    padding: 0.7rem 0.85rem;
+    border-left: 3px solid var(--rust);
+    background: var(--rust-soft);
+    color: var(--rust-deep);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .storage-warning code {
+    font-family: var(--mono);
+    font-size: 0.95em;
+    overflow-wrap: anywhere;
+  }
+
+  .summary { margin-top: 1.6rem; }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    border: 1px solid var(--line);
+    background: var(--line);
+  }
+  .summary-card {
+    min-width: 0;
+    padding: 0.9rem 1rem;
+    background: var(--paper);
+  }
+  .summary-card dt {
+    color: var(--graphite);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .summary-card dd {
+    margin-top: 0.15rem;
+    color: var(--blue);
+    font-family: var(--mono);
+    font-size: 1.65rem;
+    line-height: 1;
+  }
+
+  .records-panel {
+    margin-top: clamp(2rem, 5vw, 3.2rem);
+    padding-top: 1.2rem;
+    border-top: 2px solid var(--ink);
+  }
+  .toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: end;
+  }
+  .search-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+  .search-field label {
+    color: var(--graphite);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .search-field input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 0.9rem;
+  }
+  .search-field input:focus { border-color: var(--blue); }
+
+  .records-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.4rem 1rem;
+    margin-block: 1.4rem 0.6rem;
+  }
+  .records-head h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+  .records-count {
+    color: var(--graphite);
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-top: 1px solid var(--line);
+  }
+  .records-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .records-table thead th {
+    padding: 0.55rem 0.65rem;
+    border-bottom: 1px solid var(--ink);
+    color: var(--graphite);
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .records-table tbody th,
+  .records-table tbody td {
+    padding: 0.75rem 0.65rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .records-table tbody tr:hover { background: #FBFCFD; }
+  .record-code {
+    color: var(--graphite);
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .record-title {
+    display: block;
+    font-family: var(--serif);
+    font-size: 1.18rem;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+  .record-location {
+    display: block;
+    margin-top: 0.22rem;
+    color: var(--graphite);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .record-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.28rem;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0.12rem 0.35rem;
+    border: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tag-op { border-color: var(--blue); color: var(--blue); }
+  .tag-type { border-color: var(--rust); color: var(--rust); }
+  .record-price {
+    color: var(--blue);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
+  .record-actions .btn {
+    min-height: 44px;
+    padding: 0.42rem 0.65rem;
+  }
+
+  .empty-state {
+    padding: clamp(2rem, 6vw, 3.5rem);
+    border: 1px dashed var(--line);
+    background: var(--paper);
+    text-align: center;
+  }
+  .empty-state h3 { margin-bottom: 0.55rem; font-size: 1.8rem; }
+  .empty-state p {
+    max-width: 46ch;
+    margin: 0 auto 1.1rem;
+    color: var(--graphite);
+    font-size: 0.9rem;
+  }
+  .empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+
+  .production-note {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--blue);
+    background: var(--paper);
+  }
+  .production-note h2 { margin-bottom: 0.4rem; font-size: 1.5rem; }
+  .production-note p {
+    max-width: 84ch;
+    color: var(--graphite);
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  /* Dialogs */
+  dialog.editor,
+  dialog.confirm {
+    max-width: calc(100% - 2rem);
+    max-height: 92dvh;
+    padding: 0;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  dialog.editor {
+    width: min(920px, calc(100% - 2rem));
+    overflow: auto;
+  }
+  dialog.editor::backdrop,
+  dialog.confirm::backdrop {
+    background: rgba(20, 23, 26, 0.66);
+    overscroll-behavior: contain;
+  }
+  dialog.editor:modal { overscroll-behavior: contain; }
+
+  .editor-head {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .editor-head h2 {
+    margin-top: 0.15rem;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+  }
+  .modal-code {
+    color: var(--graphite);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .modal-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .modal-close:hover { background: var(--ink); color: var(--paper); }
+
+  .editor-body { padding: clamp(1rem, 3vw, 1.6rem); }
+  .form-required {
+    margin-bottom: 1rem;
+    color: var(--graphite);
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.03em;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.95rem 1.1rem;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+  .field-full { grid-column: 1 / -1; }
+  .field label {
+    color: var(--ink);
+    font-size: 0.77rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .req { color: var(--rust); }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid #AEB6BE;
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+  .field textarea { min-height: 112px; resize: vertical; }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus { border-color: var(--blue); }
+  .field input[readonly] {
+    background: var(--canvas);
+    color: var(--graphite);
+    font-family: var(--mono);
+  }
+  .field input:disabled,
+  .field select:disabled,
+  .field textarea:disabled {
+    background: var(--canvas);
+    color: #8A9198;
+    cursor: not-allowed;
+  }
+  .field input[aria-invalid="true"],
+  .field select[aria-invalid="true"],
+  .field textarea[aria-invalid="true"] {
+    border-color: var(--danger);
+    border-left-width: 4px;
+    background: #FFF9F6;
+  }
+  .hint {
+    color: var(--graphite);
+    font-size: 0.68rem;
+    line-height: 1.4;
+  }
+  .field-error {
+    color: #7A2E22;
+    font-size: 0.74rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .form-status {
+    margin-bottom: 1rem;
+    padding: 0.75rem 0.85rem;
+    border-left: 4px solid var(--blue);
+    background: var(--blue-soft);
+    color: var(--blue-deep);
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+  .form-status.error {
+    border-left-color: var(--danger);
+    background: #FBF4F1;
+    color: #7A2E22;
+  }
+  .external-warning {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem 0.9rem;
+    border-left: 4px solid var(--rust);
+    background: var(--rust-soft);
+    color: var(--rust-deep);
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+  .external-warning strong { color: var(--ink); }
+  .external-warning .btn {
+    align-self: flex-start;
+    border-color: var(--rust);
+    color: var(--rust-deep);
+    background: var(--paper);
+  }
+  .external-warning .btn:hover { background: var(--rust); color: var(--paper); }
+
+  .image-preview {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--blue-soft);
+  }
+  .image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .media-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--blue-soft);
+    color: var(--blue);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.07em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+  .fallback-mark {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border: 1px solid currentColor;
+  }
+  .fallback-mark::before,
+  .fallback-mark::after {
+    content: "";
+    position: absolute;
+    background: currentColor;
+  }
+  .fallback-mark::before { top: 7px; bottom: 7px; left: 50%; width: 1px; }
+  .fallback-mark::after { left: 7px; right: 7px; top: 50%; height: 1px; }
+
+  .editor-foot {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.7rem 1rem;
+    padding: 0.8rem 1rem;
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+  }
+  .form-local {
+    max-width: 38ch;
+    color: var(--graphite);
+    font-size: 0.7rem;
+    line-height: 1.45;
+  }
+
+  dialog.confirm { width: min(540px, calc(100% - 2rem)); }
+  .confirm-body { padding: 1.3rem; }
+  .confirm-body h2 {
+    margin: 0.25rem 0 0.6rem;
+    font-size: 1.8rem;
+  }
+  .confirm-body p {
+    color: var(--graphite);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+  .confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 960px) {
+    .page-head { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+    .page-head h1 { max-width: 24ch; }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 820px) {
+    .table-wrap { overflow: visible; border-top: 0; }
+    .records-table,
+    .records-table thead,
+    .records-table tbody,
+    .records-table tr,
+    .records-table th,
+    .records-table td { display: block; width: 100%; }
+    .records-table thead { display: none; }
+    .records-table tbody tr {
+      margin-bottom: 0.9rem;
+      border: 1px solid var(--line);
+      border-top: 2px solid var(--ink);
+      background: var(--paper);
+    }
+    .records-table tbody th,
+    .records-table tbody td {
+      display: grid;
+      grid-template-columns: 6.2rem minmax(0, 1fr);
+      gap: 0.6rem;
+      padding: 0.52rem 0.75rem;
+      border-bottom: 1px solid var(--line);
+      border-top: 0;
+    }
+    .records-table tbody tr > :last-child { border-bottom: 0; }
+    .records-table tbody th::before,
+    .records-table tbody td::before {
+      content: attr(data-label);
+      padding-top: 0.12rem;
+      color: var(--graphite);
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .record-actions { justify-content: flex-start; }
+    .record-price { white-space: normal; }
+    .record-code { white-space: normal; }
+  }
+
+  @media (max-width: 720px) {
+    .header-meta span:last-child { display: none; }
+    .header-main { flex-wrap: wrap; padding-block: 0.5rem; }
+    .header-actions { width: 100%; justify-content: flex-end; }
+    .toolbar { grid-template-columns: minmax(0, 1fr); }
+    .toolbar .btn { width: 100%; }
+    .form-grid { grid-template-columns: minmax(0, 1fr); }
+    .field-full { grid-column: auto; }
+    .editor-head { flex-wrap: wrap; }
+    .editor-foot .btn { flex: 1 1 12rem; }
+  }
+
+  @media (max-width: 520px) {
+    .brand-text small { display: none; }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .summary-card { padding: 0.75rem 0.8rem; }
+    .confirm-actions .btn { width: 100%; }
+    dialog.editor,
+    dialog.confirm { max-width: calc(100% - 1rem); }
+    .records-table tbody th,
+    .records-table tbody td { grid-template-columns: 5.4rem minmax(0, 1fr); }
+  }
+
+  @media (max-width: 380px) {
+    :root { --gutter: 1rem; }
+    .brand-text strong { font-size: 1.15rem; }
+    .header-actions .btn { width: 100%; }
+    .summary-grid { grid-template-columns: minmax(0, 1fr); }
+    .records-table tbody th,
+    .records-table tbody td { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+    .record-actions .btn { flex: 1 1 100%; }
+  }
+
+  .site-footer {
+    margin-top: 2.5rem;
+    padding-block: 1.6rem;
+    border-top: 1px solid rgba(197, 160, 89, 0.35);
+    background: var(--night);
+  }
+  .footer-legal {
+    max-width: 72ch;
+    margin: 0;
+    color: #B9B3A6;
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#admin-main">Saltar al contenido principal</a>
+
+<header class="site-header">
+  <div class="header-meta">
+    <span>ADAHRA · Editor local</span>
+    <span class="local-tag">No publica en Internet</span>
+  </div>
+  <div class="header-main">
+    <a class="brand" href="index.html" aria-label="ADAHRA Bienes Raíces, ver página pública">
+      <span class="brand-mark" aria-hidden="true">
+        <img src="assets/adahra-mark.webp" alt="" width="320" height="296" decoding="async">
+      </span>
+      <span class="brand-text">
+        <strong>ADAHRA</strong>
+        <small>Bienes Raíces</small>
+      </span>
+    </a>
+    <div class="header-actions">
+      <a class="btn btn-line" href="index.html">Ver página pública</a>
+    </div>
+  </div>
+</header>
+
+<main id="admin-main" tabindex="-1">
+  <div class="container">
+    <p class="notice" id="permanent-banner"><strong>Editor local, sin backend ni sesión remota.</strong> Este panel no escribe en Internet ni en GitHub: los cambios viven en la memoria de esta pestaña. Flujo de publicación: importar o cargar el JSON actual, editar, <strong>exportar <code>properties.json</code></strong>, reemplazar <code>data/properties.json</code> en el proyecto y hacer commit/push. Nada cambia en la web pública hasta ese push y su despliegue.</p>
+
+    <div class="page-head">
+      <div>
+        <p class="eyebrow">ADAHRA / Editor local</p>
+        <h1>Editor de <em>propiedades</em></h1>
+      </div>
+      <p class="page-lede">Importa, crea, edita y elimina fichas en memoria. La exportación genera el documento versionado que la web pública lee como JSON estático.</p>
+    </div>
+
+    <p class="storage-warning" id="editor-warning" role="status" aria-live="polite" hidden></p>
+    <p class="editor-status-line" id="dirty-state" data-dirty="false" role="status" aria-live="polite">Sin cambios pendientes</p>
+
+    <section class="editor-tools" aria-label="Importar, cargar y exportar catálogo">
+      <div class="search-field">
+        <label for="import-input">Importar archivo JSON</label>
+        <input id="import-input" type="file" accept=".json,application/json">
+      </div>
+      <button class="btn btn-line" id="btn-load-current" type="button">Cargar JSON actual</button>
+      <button class="btn btn-primary" id="btn-export" type="button">Exportar properties.json</button>
+      <button class="btn btn-line" id="btn-add" type="button">Agregar propiedad</button>
+    </section>
+    <p class="hint">Máximo 2 MiB y 500 propiedades. La exportación ordena las fichas por clave y usa una marca de tiempo ISO. La descarga siempre está disponible; si el navegador permite elegir archivo, se ofrece como mejora.</p>
+
+    <section class="summary" aria-labelledby="summary-title">
+      <h2 class="visually-hidden" id="summary-title">Resumen del catálogo</h2>
+      <dl class="summary-grid">
+        <div class="summary-card">
+          <dt>Fichas</dt>
+          <dd id="summary-total">0</dd>
+        </div>
+        <div class="summary-card">
+          <dt>En venta</dt>
+          <dd id="summary-sale">0</dd>
+        </div>
+        <div class="summary-card">
+          <dt>En renta</dt>
+          <dd id="summary-rent">0</dd>
+        </div>
+        <div class="summary-card">
+          <dt>Tipologías</dt>
+          <dd id="summary-types">0</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="records-panel" aria-labelledby="records-title">
+      <div class="toolbar">
+        <div class="search-field">
+          <label for="admin-search">Buscar propiedad</label>
+          <input id="admin-search" type="search" placeholder="Clave, título, colonia, ciudad o dirección" autocomplete="off" aria-describedby="admin-search-hint">
+          <span class="visually-hidden" id="admin-search-hint">Filtra la lista por clave, título, ubicación, operación o tipología.</span>
+        </div>
+      </div>
+
+      <div class="records-head">
+        <h2 id="records-title" tabindex="-1">Propiedades</h2>
+        <p class="records-count" id="records-count" role="status" aria-live="polite" aria-atomic="true">0 propiedades</p>
+      </div>
+
+      <p class="visually-hidden" id="admin-status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+      <div class="table-wrap" id="records-wrap" tabindex="0" role="region" aria-labelledby="records-title">
+        <table class="records-table">
+          <caption class="visually-hidden">Propiedades registradas en el catálogo</caption>
+          <thead>
+            <tr>
+              <th scope="col">Clave</th>
+              <th scope="col">Propiedad</th>
+              <th scope="col">Operación / tipo</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="record-body"></tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" id="admin-empty" hidden>
+        <h3 id="empty-admin-title">Sin propiedades</h3>
+        <p id="empty-admin-text">Carga el JSON actual o importa un archivo para comenzar.</p>
+        <div class="empty-actions">
+          <button class="btn btn-primary" id="empty-add" type="button">Agregar propiedad</button>
+          <button class="btn btn-line" id="empty-clear" type="button" hidden>Limpiar búsqueda</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="production-note" aria-labelledby="production-title">
+      <h2 id="production-title">Publicación segura</h2>
+      <p>GitHub Pages sólo entrega archivos estáticos: no existe un administrador global ni un backend que valide escrituras. Por eso este editor no pide contraseñas, tokens ni PAT, y no guarda nada en el servidor. Para publicar, revisa el JSON exportado, reemplaza <code>data/properties.json</code>, ejecuta las pruebas y el build, y haz commit/push. El cambio es global únicamente después del despliegue. La guía completa está en <code>DEPLOY_GITHUB.md</code>.</p>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="footer-legal">ADAHRA Bienes Raíces · Editor local. No se publica en el artefacto de GitHub Pages.</p>
+  </div>
+</footer>
+
+<dialog class="editor" id="editor-dialog" aria-labelledby="editor-title">
+  <div class="editor-head">
+    <div>
+      <p class="modal-code" id="editor-code">Nueva ficha</p>
+      <h2 id="editor-title">Agregar propiedad</h2>
+    </div>
+    <button class="modal-close" id="editor-close" type="button">Cerrar <span aria-hidden="true">×</span></button>
+  </div>
+
+  <form id="property-form" novalidate>
+    <div class="editor-body">
+      <div class="form-status error" id="editor-errors" role="alert" hidden></div>
+
+      <p class="form-required">Los campos marcados con <span class="req">*</span> son obligatorios. La clave se genera automáticamente y no cambia al editar.</p>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="field-id">Clave</label>
+          <input id="field-id" name="id" type="text" readonly aria-describedby="hint-id" data-field="id">
+          <p class="hint" id="hint-id">Se genera automáticamente y se conserva al editar.</p>
+          <p class="field-error" id="error-id" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-title">Título <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-title" name="title" type="text" autocomplete="off" maxlength="120" aria-required="true" aria-describedby="error-title" data-field="title">
+          <p class="field-error" id="error-title" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-operation">Operación <span class="req" aria-hidden="true">*</span></label>
+          <select id="field-operation" name="operation" aria-required="true" aria-describedby="error-operation" data-field="operation">
+            <option value="venta">Venta</option>
+            <option value="renta">Renta</option>
+          </select>
+          <p class="field-error" id="error-operation" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-type">Tipología <span class="req" aria-hidden="true">*</span></label>
+          <select id="field-type" name="type" aria-required="true" aria-describedby="error-type" data-field="type">
+            <option value="casa">Casa</option>
+            <option value="departamento">Departamento</option>
+            <option value="penthouse">Penthouse</option>
+            <option value="terreno">Terreno</option>
+          </select>
+          <p class="field-error" id="error-type" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-neighborhood">Colonia o zona <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-neighborhood" name="neighborhood" type="text" autocomplete="off" maxlength="80" aria-required="true" aria-describedby="error-neighborhood" data-field="neighborhood">
+          <p class="field-error" id="error-neighborhood" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-city">Ciudad <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-city" name="city" type="text" autocomplete="off" maxlength="80" aria-required="true" aria-describedby="error-city" data-field="city">
+          <p class="field-error" id="error-city" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-state">Estado <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-state" name="state" type="text" autocomplete="off" maxlength="80" aria-required="true" aria-describedby="error-state" data-field="state">
+          <p class="field-error" id="error-state" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-address">Dirección <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-address" name="address" type="text" autocomplete="off" maxlength="160" aria-required="true" aria-describedby="error-address" data-field="address">
+          <p class="field-error" id="error-address" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-price">Precio en MXN <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-price" name="price" type="text" inputmode="numeric" autocomplete="off" aria-required="true" aria-describedby="hint-price error-price" data-field="price">
+          <p class="hint" id="hint-price">Entero mayor que cero, sin decimales. Puedes escribir separadores de miles.</p>
+          <p class="field-error" id="error-price" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-construction">Construcción (m²)</label>
+          <input id="field-construction" name="construction" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hint-construction error-construction" data-field="construction">
+          <p class="hint" id="hint-construction">Obligatorio para casa, departamento o penthouse.</p>
+          <p class="field-error" id="error-construction" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-lot">Terreno (m²)</label>
+          <input id="field-lot" name="lot" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hint-lot error-lot" data-field="lot">
+          <p class="hint" id="hint-lot">Opcional. Se guarda como nulo si queda vacío.</p>
+          <p class="field-error" id="error-lot" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-beds">Recámaras</label>
+          <input id="field-beds" name="beds" type="text" inputmode="numeric" autocomplete="off" aria-describedby="error-beds" data-field="beds">
+          <p class="field-error" id="error-beds" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-baths">Baños</label>
+          <input id="field-baths" name="baths" type="text" inputmode="decimal" autocomplete="off" aria-describedby="hint-baths error-baths" data-field="baths">
+          <p class="hint" id="hint-baths">Puede ser múltiplo de 0.5 (por ejemplo 2 o 2.5).</p>
+          <p class="field-error" id="error-baths" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-parking">Estacionamiento (autos)</label>
+          <input id="field-parking" name="parking" type="text" inputmode="numeric" autocomplete="off" aria-describedby="error-parking" data-field="parking">
+          <p class="field-error" id="error-parking" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="field-year">Año</label>
+          <input id="field-year" name="year" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hint-year error-year" data-field="year">
+          <p class="hint" id="hint-year">Entre 1800 y 2100. No aplica en terreno.</p>
+          <p class="field-error" id="error-year" hidden></p>
+        </div>
+
+        <div class="field field-full">
+          <label for="field-description">Descripción <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="field-description" name="description" rows="4" maxlength="3000" aria-required="true" aria-describedby="hint-description error-description" data-field="description"></textarea>
+          <p class="hint" id="hint-description">Entre 10 y 3000 caracteres. Describe el espacio sin datos personales de terceros.</p>
+          <p class="field-error" id="error-description" hidden></p>
+        </div>
+
+        <div class="field field-full">
+          <label for="field-features">Amenidades <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="field-features" name="features" rows="3" aria-required="true" aria-describedby="hint-features error-features" data-field="features"></textarea>
+          <p class="hint" id="hint-features">Una por línea o separadas por comas. Entre 1 y 8 amenidades; cada una de hasta 80 caracteres.</p>
+          <p class="field-error" id="error-features" hidden></p>
+        </div>
+
+        <div class="field field-full">
+          <label for="field-image">URL de la imagen <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-image" name="image" type="url" inputmode="url" autocomplete="off" maxlength="1000" aria-required="true" aria-describedby="hint-image error-image" data-field="image">
+          <p class="hint" id="hint-image">Dirección <code>https://</code>. Si la imagen falla, la página pública muestra un respaldo gráfico.</p>
+          <p class="field-error" id="error-image" hidden></p>
+        </div>
+
+        <div class="field field-full">
+          <label for="field-alt">Texto alternativo de la imagen <span class="req" aria-hidden="true">*</span></label>
+          <input id="field-alt" name="alt" type="text" autocomplete="off" maxlength="200" aria-required="true" aria-describedby="error-alt" data-field="alt">
+          <p class="field-error" id="error-alt" hidden></p>
+        </div>
+
+        <div class="field field-full">
+          <span class="hint" id="preview-label">Previsualización de la imagen</span>
+          <div class="image-preview" aria-labelledby="preview-label">
+            <img id="image-preview" alt="Previsualización de la imagen" width="480" height="360" loading="lazy" decoding="async">
+            <div class="media-fallback" id="image-fallback" hidden>
+              <span class="fallback-mark" aria-hidden="true"></span>
+              <span>Sin imagen disponible</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-foot">
+      <button class="btn btn-primary" id="editor-save" type="submit">Guardar propiedad</button>
+      <button class="btn btn-line" id="editor-cancel" type="button">Cancelar</button>
+      <p class="form-local">Los cambios viven en memoria hasta que exportes el JSON. No se envían a ningún servidor.</p>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="confirm" id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-text">
+  <div class="confirm-body">
+    <p class="modal-code">Confirmar eliminación</p>
+    <h2 id="delete-title">Eliminar ficha</h2>
+    <p id="delete-text"></p>
+    <div class="form-status error" id="delete-error" role="alert" hidden></div>
+    <div class="confirm-actions">
+      <button class="btn btn-danger" id="delete-confirm" type="button">Eliminar definitivamente</button>
+      <button class="btn btn-line" id="delete-cancel" type="button">Cancelar</button>
+    </div>
+  </div>
+</dialog>
+
+<script type="module" src="admin-app.js"></script>
+</body>
+</html>

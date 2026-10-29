@@ -1,0 +1,18 @@
+{
+  "name": "adahra-bienes-raices",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Catálogo inmobiliario estático: web pública de sólo lectura y editor local que exporta data/properties.json.",
+  "scripts": {
+    "serve": "./start.sh",
+    "serve:admin": "./start-admin.sh",
+    "build:pages": "node scripts/build-pages.mjs",
+    "test": "node --test tests/catalog-document.test.js tests/markup.test.js tests/build.test.js",
+    "test:e2e": "python3 tests/e2e-browser.py",
+    "test:all": "npm test && npm run build:pages && npm run test:e2e"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

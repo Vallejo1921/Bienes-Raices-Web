@@ -1,0 +1,31 @@
+# Artefacto de GitHub Pages generado por scripts/build-pages.mjs
+_site/
+
+# Dependencias y artefactos locales
+node_modules/
+npm-debug.log*
+*.log
+
+# Secretos y credenciales (nunca se publican)
+.env
+.env.*
+serviceAccountKey.json
+*-adminsdk-*.json
+*.pem
+*.key
+.firebaserc
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Fotos originales de WhatsApp (material de origen, nunca se publican).
+# Sólo se versionan los derivados optimizados de assets/.
+WhatsApp Image *.jpeg
+
+# data/properties.json SÍ se versiona: es el catálogo público.
+
+__pycache__/
+*.pyc
