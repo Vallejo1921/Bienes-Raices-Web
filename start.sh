@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 PORT="${PORT:-8782}"
+HOST="${HOST:-0.0.0.0}"
 
 if ! command -v python3 >/dev/null 2>&1; then
   printf 'Error: se requiere python3 para iniciar el servidor local.\n' >&2
@@ -36,4 +37,4 @@ printf 'La web lee data/properties.json sin backend. Para editar el catálogo\n'
 printf 'usa ./start-admin.sh (editor local) y publica con Git.\n'
 printf 'Servidor en primer plano. Pulsa Ctrl+C para detenerlo.\n\n'
 
-exec python3 -m http.server "$PORT" --bind 127.0.0.1
+exec python3 -m http.server "$PORT" --bind "$HOST"

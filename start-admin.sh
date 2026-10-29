@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 PORT="${PORT:-8783}"
-HOST="127.0.0.1"
+HOST="${HOST:-0.0.0.0}"
 
 if ! command -v python3 >/dev/null 2>&1; then
   printf 'Error: se requiere python3 para iniciar el editor local.\n' >&2
